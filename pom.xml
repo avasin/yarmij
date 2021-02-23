@@ -9,6 +9,10 @@
     <version>0.1.0-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
+    <description>
+        Yarmij is a library to replace standard Java RMI for the case when you need it on Android.
+    </description>
+    <url>https://github.com/avasin/yarmij</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
