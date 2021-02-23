@@ -51,7 +51,7 @@ public class CommunicationTest {
     private static final String LOCALHOST = "localhost";
     private static final String STRUCTURE_ID = "structureId";
     private static final RmiBuilder RMI_BUILDER = new RmiBuilder().
-                    withTimeoutMs(Long.MAX_VALUE);
+                    withTimeoutMs(60_000L);
 
     /**
      * Rule that should be used to check existing
