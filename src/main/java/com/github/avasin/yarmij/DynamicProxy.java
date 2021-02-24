@@ -26,12 +26,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.github.avasin.yarmij.messages.RmiInvokeMethodMessage;
+import com.github.avasin.yarmij.messages.RmiMessageId;
 import com.github.avasin.yarmij.messages.RmiMethodResultMessage;
+import com.github.avasin.yarmij.messages.RmiSignature;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.avasin.yarmij.messages.RmiSignature;
 
 /**
  * {@link DynamicProxy} represents a stub on the client side that converts all client service method
@@ -60,7 +60,14 @@ public class DynamicProxy<I> implements InvocationHandler {
                     throws RmiException, InterruptedException {
         this.type = type;
         this.exchanger = exchanger;
-        exchanger.exchange(new RmiInvokeMethodMessage<>(0, new RmiSignature<>(type, null), null));
+        exchanger.exchange(new RmiInvokeMethodMessage<>(createMessageId(type, type.getSimpleName()),
+                        null));
+    }
+
+    private RmiMessageId<I> createMessageId(Class<I> type, String methodName) {
+        final RmiSignature<I> signature = new RmiSignature<>(type, methodName);
+        return new RmiMessageId<>(Thread.currentThread().getName(), ensureCallNumber(signature),
+                        signature);
     }
 
     @Nullable
@@ -73,10 +80,8 @@ public class DynamicProxy<I> implements InvocationHandler {
             return String.format("%s for '%s'", DynamicProxy.class.getSimpleName(), typeName);
         }
         LOGGER.trace("{}#{} called with the following arguments: {}", typeName, methodName, args);
-        final RmiSignature<I> signature = new RmiSignature<>(type, methodName);
-        final long callNumber = ensureCallNumber(signature).getAndIncrement();
         final RmiInvokeMethodMessage<I> message =
-                        new RmiInvokeMethodMessage<>(callNumber, signature, args);
+                        new RmiInvokeMethodMessage<>(createMessageId(type, methodName), args);
         final RmiMethodResultMessage<I> methodResult = exchanger.exchange(message);
         final Object result = methodResult.getResult();
         LOGGER.trace("{}#{} call with {} arguments returned {} result", typeName, methodName, args,
@@ -85,13 +90,14 @@ public class DynamicProxy<I> implements InvocationHandler {
 
     }
 
-    private AtomicLong ensureCallNumber(RmiSignature<I> signature) {
+    private long ensureCallNumber(RmiSignature<I> signature) {
         AtomicLong existing = signatureToCallNumber.get(signature);
         if (existing == null) {
             final AtomicLong newValue = new AtomicLong();
             existing = signatureToCallNumber.put(signature, newValue);
-            return existing == null ? newValue : existing;
+            final AtomicLong result = existing == null ? newValue : existing;
+            return result.getAndIncrement();
         }
-        return existing;
+        return existing.getAndIncrement();
     }
 }

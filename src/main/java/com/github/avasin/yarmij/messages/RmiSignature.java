@@ -43,7 +43,7 @@ public class RmiSignature<I> {
      * @param interfaceType type of the interface that contains method declaration
      * @param methodName of the method in interface
      */
-    public RmiSignature(@Nonnull Class<I> interfaceType, @Nullable String methodName) {
+    public RmiSignature(@Nonnull Class<I> interfaceType, @Nonnull String methodName) {
         this.interfaceType = interfaceType;
         this.methodName = methodName;
     }
@@ -53,9 +53,17 @@ public class RmiSignature<I> {
         return interfaceType;
     }
 
-    @Nullable
+    @Nonnull
     public String getMethodName() {
         return methodName;
+    }
+
+    /**
+     * Checks whether we are calling constructor of the interface type or not.
+     * @return
+     */
+    public boolean isConstructor() {
+        return interfaceType.getSimpleName().equals(methodName);
     }
 
     @Override

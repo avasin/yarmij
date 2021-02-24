@@ -7,7 +7,7 @@
     </Appenders>
     <Loggers>
         <!-- avoid duplicated logs with additivity=false -->
-        <Logger name="com.smartcat" level="info" additivity="false">
+        <Logger name="com.github.avasin" level="info" additivity="false">
             <AppenderRef ref="LogToConsole"/>
         </Logger>
         <Root level="info">

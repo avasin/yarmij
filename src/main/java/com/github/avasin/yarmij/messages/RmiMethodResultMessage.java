@@ -61,7 +61,7 @@ public class RmiMethodResultMessage<I> extends AbstractRmiMessage<I> {
 
     @Override
     public String toString() {
-        return String.format("%s [messageId=%s, exception=%s, returnType=%s]",
+        return String.format("%s [messageId=%s, exception=%s, result=%s]",
                         getClass().getSimpleName(), this.getMessageId(), exception, result);
     }
 }

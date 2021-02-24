@@ -27,6 +27,7 @@ import javax.annotation.Nonnull;
  * @param <I> type of the implementation that will handle method invocation.
  */
 public class RmiMessageId<I> {
+    private final String threadName;
     private final long callNumber;
     private final RmiSignature<I> signature;
 
@@ -34,16 +35,19 @@ public class RmiMessageId<I> {
      * Required by Kryo library for serialization.
      */
     private RmiMessageId() {
-        this(0, null);
+        this(null, 0, null);
     }
 
     /**
      * Creates {@link RmiMessageId} instance.
      *
+     * @param threadName name of the thread that created message identifier.
      * @param callNumber sequence number of method call.
      * @param signature signature of the method that is going to be called.
      */
-    public RmiMessageId(long callNumber, @Nonnull RmiSignature<I> signature) {
+    public RmiMessageId(@Nonnull String threadName, long callNumber,
+                    @Nonnull RmiSignature<I> signature) {
+        this.threadName = threadName;
         this.callNumber = callNumber;
         this.signature = signature;
     }
@@ -62,17 +66,20 @@ public class RmiMessageId<I> {
             return false;
         }
         final RmiMessageId<?> that = (RmiMessageId<?>)o;
-        return callNumber == that.callNumber && Objects.equals(getSignature(), that.getSignature());
+        return callNumber == that.callNumber
+                        && Objects.equals(threadName, that.threadName)
+                        && Objects.equals(getSignature(), that.getSignature());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(callNumber, getSignature());
+        return Objects.hash(threadName, callNumber, getSignature());
     }
 
     @Override
     public String toString() {
-        return String.format("%s [callNumber=%s, signature=%s]", getClass().getSimpleName(),
-                        this.callNumber, this.signature);
+        return String.format("%s [threadName=%s, callNumber=%s, signature=%s]",
+                        getClass().getSimpleName(), this.threadName, this.callNumber,
+                        this.signature);
     }
 }

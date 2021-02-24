@@ -21,6 +21,7 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 
 import com.github.avasin.yarmij.messages.RmiMessage;
+import com.github.avasin.yarmij.messages.RmiMessageId;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +78,8 @@ public class ListeningTask<T extends RmiMessage<?>> implements Runnable {
             } catch (RmiException ex) {
                 LOGGER.error("Cannot get new message from '{}'", connection, ex);
             } catch (Exception ex) {
-                LOGGER.error("Unexpected error failed while processing '{}' message from '{}'",
-                                message, connection, ex);
+                LOGGER.error("Unexpected error failed while listening '{}' during '{}' message processing from '{}'",
+                                messageType.getSimpleName(), message, connection, ex);
             }
         }
         connections.remove(connection);

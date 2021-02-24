@@ -35,20 +35,18 @@ public class RmiInvokeMethodMessage<I> extends AbstractRmiMessage<I> {
      * Required by Kryo library for serialization.
      */
     private RmiInvokeMethodMessage() {
-        this(0, null, null);
+        this(null, null);
     }
 
     /**
      * Creates {@link RmiInvokeMethodMessage} instance.
      *
-     * @param callNumber sequence number of method call.
-     * @param signature signature of the method that is going to be called.
+     * @param messageId message identifier
      * @param args contains method arguments or {@code null} in case method does not
-     *                 accept parameters.
+ *                 accept parameters.
      */
-    public RmiInvokeMethodMessage(long callNumber, @Nonnull RmiSignature<I> signature,
-                    @Nullable Object[] args) {
-        super(new RmiMessageId<>(callNumber, signature));
+    public RmiInvokeMethodMessage(@Nonnull RmiMessageId<I> messageId, @Nullable Object... args) {
+        super(messageId);
         this.args = args;
     }
 

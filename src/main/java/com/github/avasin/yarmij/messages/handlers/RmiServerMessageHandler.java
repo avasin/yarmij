@@ -58,7 +58,7 @@ public class RmiServerMessageHandler extends AbstractMessageHandler<RmiMessage<?
                                             type.getSimpleName())), null);
             return;
         }
-        if (signature.getMethodName() == null) {
+        if (type.getSimpleName().equals(signature.getMethodName())) {
             sendMethodResultMessage(connection, message, null, null);
             logger.debug("Requested '{}' interface has registered implementation",
                             type.getSimpleName());

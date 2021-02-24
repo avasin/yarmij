@@ -50,8 +50,9 @@ public class CommunicationTest {
     private static final int PORT = 0;
     private static final String LOCALHOST = "localhost";
     private static final String STRUCTURE_ID = "structureId";
+    public static final long ONE_MINUTE = 60_000L;
     private static final RmiBuilder RMI_BUILDER = new RmiBuilder().
-                    withTimeoutMs(60_000L);
+                    withTimeoutMs(ONE_MINUTE);
 
     /**
      * Rule that should be used to check existing

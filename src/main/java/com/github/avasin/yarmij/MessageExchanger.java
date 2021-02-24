@@ -20,17 +20,22 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 
 import com.github.avasin.yarmij.messages.RmiInvokeMethodMessage;
-import com.github.avasin.yarmij.messages.RmiMethodResultMessage;
 import com.github.avasin.yarmij.messages.RmiMessageId;
+import com.github.avasin.yarmij.messages.RmiMethodResultMessage;
 import com.github.avasin.yarmij.messages.RmiSignature;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link MessageExchanger} sends a message and waits for the response. Handles all messages that
@@ -74,15 +79,16 @@ public class MessageExchanger
     @Nonnull
     public <I> RmiMethodResultMessage<I> exchange(@Nonnull RmiInvokeMethodMessage<I> message)
                     throws RmiException, InterruptedException {
-        connection.sendMessage(message);
-        final BlockingQueue<RmiMethodResultMessage<I>> results = new SynchronousQueue<>();
+        final BlockingQueue<RmiMethodResultMessage<I>> results = new LinkedBlockingQueue<>(1);
         receivedResults.put(message.getMessageId(), results);
+        connection.sendMessage(message);
         final RmiMethodResultMessage<I> result = results.poll(timeoutMs, TimeUnit.MILLISECONDS);
         if (result == null) {
             throw new RmiException(
                             String.format("Cannot get result for '%s' from '%s' in '%s' milliseconds",
                                             message, connection, timeoutMs));
         }
+
         final Throwable exception = result.getException();
         if (exception != null) {
             if (exception instanceof RmiException) {
@@ -105,8 +111,8 @@ public class MessageExchanger
     public void accept(@Nonnull RmiConnection connection,
                     @Nonnull RmiMethodResultMessage<?> message) {
         @SuppressWarnings("unchecked")
-        final Collection<RmiMethodResultMessage<?>> messages =
-                        (Collection<RmiMethodResultMessage<?>>)receivedResults
+        final BlockingQueue<RmiMethodResultMessage<?>> messages =
+                        (BlockingQueue<RmiMethodResultMessage<?>>)receivedResults
                                         .get(message.getMessageId());
         messages.add(message);
     }
