@@ -16,10 +16,10 @@
 
 package com.github.avasin.yarmij.messages;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * {@link RmiSignature} contains information to find method on the server side.
@@ -29,23 +29,25 @@ import javax.annotation.Nullable;
 public class RmiSignature<I> {
     private final Class<I> interfaceType;
     private final String methodName;
+    private final Class<?>[] parameters;
 
     /**
      * Required by Kryo library for serialization.
      */
     private RmiSignature() {
-        this(null, null);
+        this(null, null, null);
     }
 
     /**
      * Creates {@link RmiSignature} instance.
-     *
-     * @param interfaceType type of the interface that contains method declaration
+     *  @param interfaceType type of the interface that contains method declaration
      * @param methodName of the method in interface
+     * @param parameters types of method in interface
      */
-    public RmiSignature(@Nonnull Class<I> interfaceType, @Nonnull String methodName) {
+    public RmiSignature(@Nonnull Class<I> interfaceType, @Nonnull String methodName, @Nonnull Class<?>[] parameters) {
         this.interfaceType = interfaceType;
         this.methodName = methodName;
+        this.parameters = parameters;
     }
 
     @Nonnull
@@ -58,6 +60,11 @@ public class RmiSignature<I> {
         return methodName;
     }
 
+    @Nonnull
+    public Class<?>[] getParameters() {
+        return parameters;
+    }
+
     /**
      * Checks whether we are calling constructor of the interface type or not.
      * @return
@@ -68,20 +75,17 @@ public class RmiSignature<I> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final RmiSignature<?> that = (RmiSignature<?>)o;
-        return Objects.equals(getInterfaceType(), that.getInterfaceType()) && Objects
-                        .equals(getMethodName(), that.getMethodName());
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RmiSignature<?> that = (RmiSignature<?>) o;
+        return getInterfaceType().equals(that.getInterfaceType()) && getMethodName().equals(that.getMethodName()) && Arrays.equals(getParameters(), that.getParameters());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInterfaceType(), getMethodName());
+        int result = Objects.hash(getInterfaceType(), getMethodName());
+        result = 31 * result + Arrays.hashCode(getParameters());
+        return result;
     }
 
     @Override

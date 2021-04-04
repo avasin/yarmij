@@ -79,7 +79,7 @@ public class RmiServer extends AbstractSocketAware<ServerSocket> implements Runn
      * @param <I> type of the implementation that is going to be registered.
      */
     public <I> void register(@Nonnull Class<I> type, @Nonnull I implementation) {
-        handlers.put(type, new RmiInvokeMethodMessageHandler<>(implementation));
+        handlers.put(type, new RmiInvokeMethodMessageHandler<>(type, implementation));
     }
 
     /**
