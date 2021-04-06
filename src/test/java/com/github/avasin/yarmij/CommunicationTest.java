@@ -109,6 +109,12 @@ public class CommunicationTest {
                                         .singleton(createComplexStructure(STRUCTURE_ID))));
     }
 
+    /**
+     * Checks that overloaded method executing is working well.
+     *
+     * @throws RmiException in case something goes wrong during client/server
+     *                interaction.
+     */
     @Test
     public void checkOverloadedMethodWithTwoParameters() throws RmiException {
         final String name = "John";

@@ -75,22 +75,26 @@ public class RmiSignature<I> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        RmiSignature<?> that = (RmiSignature<?>) o;
-        return getInterfaceType().equals(that.getInterfaceType()) && getMethodName().equals(that.getMethodName()) && Arrays.equals(getParameters(), that.getParameters());
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final RmiSignature<?> that = (RmiSignature<?>) o;
+        return Objects.equals(getInterfaceType(), that.getInterfaceType()) &&
+                Objects.equals(getMethodName(), that.getMethodName()) &&
+                Arrays.equals(getParameters(), that.getParameters());
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(getInterfaceType(), getMethodName());
-        result = 31 * result + Arrays.hashCode(getParameters());
-        return result;
+        return Objects.hash(getInterfaceType(), getMethodName(), Arrays.hashCode(getParameters()));
     }
 
     @Override
     public String toString() {
-        return String.format("%s [interfaceType=%s, methodName=%s]", getClass().getSimpleName(),
-                        this.interfaceType.getSimpleName(), this.methodName);
+        return String.format("%s [interfaceType=%s, methodName=%s, parameters=%s]", getClass().getSimpleName(),
+                        this.interfaceType.getSimpleName(), this.methodName, Arrays.toString(this.parameters));
     }
 }
