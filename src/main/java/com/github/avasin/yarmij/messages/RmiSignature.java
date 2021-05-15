@@ -65,14 +65,6 @@ public class RmiSignature<I> {
         return parameters;
     }
 
-    /**
-     * Checks whether we are calling constructor of the interface type or not.
-     * @return
-     */
-    public boolean isConstructor() {
-        return interfaceType.getSimpleName().equals(methodName);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
