@@ -25,11 +25,17 @@ import java.util.HashSet;
  */
 public class SimpleServiceImpl implements SimpleService {
 
-    public static final String MESSAGE_FORMAT = "Hello %s";
+    public static final String HELLO_NAME_ONLY_FORMAT = "Hello %s";
+    public static final String HELLO_NAME_AND_LAST_NAME_FORMAT = "Hello %s %s!";
 
     @Override
     public String sayHello(String name) {
-        return String.format(MESSAGE_FORMAT, name);
+        return String.format(HELLO_NAME_ONLY_FORMAT, name);
+    }
+
+    @Override
+    public String sayHello(String name, String lastName) {
+        return String.format(HELLO_NAME_AND_LAST_NAME_FORMAT, name, lastName);
     }
 
     @Override

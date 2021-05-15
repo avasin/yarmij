@@ -33,20 +33,21 @@ import com.github.avasin.yarmij.messages.RmiSignature;
 public class RmiInvokeMethodMessageHandler<I>
                 extends AbstractMessageHandler<RmiInvokeMethodMessage<I>> {
     private final I implementation;
-    private final Map<String, Method> methodNameToMethod;
+    private final Map<RmiSignature<I>, Method> methodNameToMethod;
     private final Class<?> implementationClass;
 
     /**
      * {@link RmiServerMessageHandler} instance creator.
      *
+     * @param type of interface whose method will be invoked.
      * @param implementation that provides real method implementations.
      */
-    public RmiInvokeMethodMessageHandler(@Nonnull I implementation) {
+    public RmiInvokeMethodMessageHandler(@Nonnull Class<I> type, @Nonnull I implementation) {
         this.implementation = implementation;
         this.methodNameToMethod = new ConcurrentHashMap<>();
         this.implementationClass = implementation.getClass();
         for (Method method : implementationClass.getMethods()) {
-            methodNameToMethod.put(method.getName(), method);
+            methodNameToMethod.put(new RmiSignature<>(type, method.getName(), method.getParameterTypes()), method);
         }
     }
 
@@ -54,8 +55,7 @@ public class RmiInvokeMethodMessageHandler<I>
     public void accept(@Nonnull RmiConnection transport,
                     @Nonnull RmiInvokeMethodMessage<I> message) {
         final RmiSignature<I> signature = message.getSignature();
-        final String methodName = signature.getMethodName();
-        final Method method = methodNameToMethod.get(methodName);
+        final Method method = methodNameToMethod.get(signature);
         if (method == null) {
             final NoSuchMethodException exception = new NoSuchMethodException(
                             String.format("There is no '%s' method in '%s'",
@@ -75,7 +75,7 @@ public class RmiInvokeMethodMessageHandler<I>
                             ((InvocationTargetException)ex).getTargetException() :
                             ex;
             logger.error("Cannot execute {}#{} with {} arguments",
-                            implementationClass.getSimpleName(), methodName, message.getArgs(),
+                            implementationClass.getSimpleName(), signature.getMethodName(), message.getArgs(),
                             exception);
         }
         sendMethodResultMessage(transport, message, exception, result);

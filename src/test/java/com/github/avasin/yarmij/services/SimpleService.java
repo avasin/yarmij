@@ -34,6 +34,16 @@ public interface SimpleService {
     String sayHello(String name) throws RmiException;
 
     /**
+     * Receives two simple strings, converts it into a different string and returns back.
+     *
+     * @param name name which will be hailed.
+     * @param lastName last name which will be hailed.
+     * @return hail for specified name.
+     * @throws RmiException in case of any error during remote method execution
+     */
+    String sayHello(String name, String lastName) throws RmiException;
+
+    /**
      * Receives collection of strings converts it into a collection of {@link ComplexStructure}s and
      * returns back.
      *

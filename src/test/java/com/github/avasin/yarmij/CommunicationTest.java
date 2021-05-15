@@ -110,6 +110,20 @@ public class CommunicationTest {
     }
 
     /**
+     * Checks that overloaded method executing is working well.
+     *
+     * @throws RmiException in case something goes wrong during client/server
+     *                interaction.
+     */
+    @Test
+    public void checkOverloadedMethodWithTwoParameters() throws RmiException {
+        final String name = "John";
+        final String lastName = "Watson";
+        MatcherAssert.assertThat(service.sayHello(name, lastName), CoreMatchers.is(String
+                .format(SimpleServiceImpl.HELLO_NAME_AND_LAST_NAME_FORMAT, name, lastName)));
+    }
+
+    /**
      * Checks that checked exception failed on the server side will be correctly passed and provided
      * to the client.
      *
@@ -224,7 +238,7 @@ public class CommunicationTest {
                 clientReadyLatch.countDown();
                 try {
                     MatcherAssert.assertThat(service.sayHello(name), CoreMatchers.is(String
-                                    .format(SimpleServiceImpl.MESSAGE_FORMAT, name)));
+                                    .format(SimpleServiceImpl.HELLO_NAME_ONLY_FORMAT, name)));
                 } catch (RmiException e) {
                     throw new RuntimeException("Unexpected failure", e);
                 }

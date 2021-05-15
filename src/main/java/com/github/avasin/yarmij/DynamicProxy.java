@@ -64,8 +64,8 @@ public class DynamicProxy<I> implements InvocationHandler {
                         null));
     }
 
-    private RmiMessageId<I> createMessageId(Class<I> type, String methodName) {
-        final RmiSignature<I> signature = new RmiSignature<>(type, methodName);
+    private RmiMessageId<I> createMessageId(Class<I> type, String methodName, Class<?>... parameters) {
+        final RmiSignature<I> signature = new RmiSignature<>(type, methodName, parameters);
         return new RmiMessageId<>(Thread.currentThread().getName(), ensureCallNumber(signature),
                         signature);
     }
@@ -81,7 +81,7 @@ public class DynamicProxy<I> implements InvocationHandler {
         }
         LOGGER.trace("{}#{} called with the following arguments: {}", typeName, methodName, args);
         final RmiInvokeMethodMessage<I> message =
-                        new RmiInvokeMethodMessage<>(createMessageId(type, methodName), args);
+                        new RmiInvokeMethodMessage<>(createMessageId(type, methodName, method.getParameterTypes()), args);
         final RmiMethodResultMessage<I> methodResult = exchanger.exchange(message);
         final Object result = methodResult.getResult();
         LOGGER.trace("{}#{} call with {} arguments returned {} result", typeName, methodName, args,
